@@ -10,13 +10,13 @@ export const metadata = {
 export default  async function RootLayout({ children }) {
 
   const conn= await dbConnect();
-  // MongoDB-এর সব Collections/Tables-এর নাম পাওয়ার জন্য
-  if (conn?.connection?.db) {
-    const collections = await conn.connection.db.listCollections().toArray();
-    const collectionNames = collections.map((col) => col.name);
+  // // MongoDB-এর সব Collections/Tables-এর নাম পাওয়ার জন্য
+  // if (conn?.connection?.db) {
+  //   const collections = await conn.connection.db.listCollections().toArray();
+  //   const collectionNames = collections.map((col) => col.name);
 
-    console.log("Database Collections/Tables:", collectionNames);
-  }
+  //   console.log("Database Collections/Tables:", collectionNames);
+  // }
 
   return (
     <html
