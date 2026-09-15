@@ -6,7 +6,7 @@ import { Module } from "../model/module-model";
 import { replaceMongoIdInArray } from "@/lib/convertData";
 
 
-export async function getCoursesList() {
+export async function getCourseList() {
   const courses= await Course.find({}).select(["title","subtitle","thumbnail","modules","price","category","instructor"]).populate({
     path: "category",
     model: Category,

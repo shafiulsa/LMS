@@ -9,7 +9,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Support from "@/components/support";
 import Element from "@/components/element";
-import { getCoursesList } from "../../../queries/courses";
+import { getCourseList } from "../../../queries/courses";
 import CourseCard from "./courses/_components/CourseCard";
 import { getCategories } from "../../../queries/categories";
 
@@ -20,7 +20,7 @@ const  HomePage = async() => {
 
 
   // Get courses list
-  const courses = await getCoursesList();
+  const courses = await getCourseList();
   // console.log(courses);
  const categories=await getCategories();
 //  console.log(categories);
@@ -78,7 +78,7 @@ const  HomePage = async() => {
           <SectionTitle>Categories</SectionTitle>
 
           <Link
-            href={""}
+            href={"/courses"}
             className=" text-sm font-medium  hover:opacity-80 flex items-center gap-1"
           >
             Browse All <ArrowRightIcon className="h-4 w-4" />
@@ -113,7 +113,7 @@ const  HomePage = async() => {
         <div className="flex items-center justify-between">
           <SectionTitle>Courses</SectionTitle>
           <Link
-            href={""}
+            href={"/courses"}
             className=" text-sm font-medium  hover:opacity-80 flex items-center gap-1"
           >
             Browse All <ArrowRightIcon className="h-4 w-4" />
