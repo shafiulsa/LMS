@@ -31,7 +31,7 @@ const MainLayout = ({children} ) => {
     </div>
   </header>
 
-  <main>{children}</main>
+  <main className='flex-1 pt-20 flex flex-col'>{children}</main>
   <SiteFooter/>
 </div>
   )
