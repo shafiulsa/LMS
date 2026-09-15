@@ -112,7 +112,6 @@ const MainNav = ({ items, children }) => {
                                 Profile
                             </Link>
                         </DropdownMenuItem>
-
                         <DropdownMenuItem className="cursor-pointer">
                             <Link href="/account/enrolled-courses">
                                 My Courses
@@ -138,7 +137,7 @@ const MainNav = ({ items, children }) => {
                     className="flex items-center space-x-2 lg:hidden"
                     onClick={() => setShowMobileMenu(!showMobileMenu)}
                 >
-                    {showMobileMenu ? <X /> : <Menu />}
+                    {showMobileMenu ? <X /> : <Menu />} 
                 </button>
             </nav>
 
