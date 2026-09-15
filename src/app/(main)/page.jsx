@@ -11,52 +11,10 @@ import Support from "@/components/support";
 import Element from "@/components/element";
 import { getCoursesList } from "../../../queries/courses";
 import CourseCard from "./courses/_components/CourseCard";
+import { getCategories } from "../../../queries/categories";
 
 
 
-const categories = [
-  {
-    id: 1,
-    title: "Design",
-    thumbnail: "/assets/images/categories/design.jpg",
-  },
-
-  {
-    id: 3,
-    title: "Development",
-    thumbnail: "/assets/images/categories/development.jpg",
-  },
-  {
-    id: 4,
-    title: "Marketing",
-    thumbnail: "/assets/images/categories/marketing.jpg",
-  },
-  {
-    id: 5,
-    title: "IT & Software",
-    thumbnail: "/assets/images/categories/it_software.jpg",
-  },
-  {
-    id: 6,
-    title: "Personal Development",
-    thumbnail: "/assets/images/categories/personal_development.jpg",
-  },
-  {
-    id: 7,
-    title: "Business",
-    thumbnail: "/assets/images/categories/programming.jpg",
-  },
-  {
-    id: 8,
-    title: "Photography",
-    thumbnail: "/assets/images/categories/photography.jpg",
-  },
-  {
-    id: 9,
-    title: "Music",
-    thumbnail: "/assets/images/categories/music.jpg",
-  },
-];
 
 const  HomePage = async() => {
 
@@ -64,7 +22,8 @@ const  HomePage = async() => {
   // Get courses list
   const courses = await getCoursesList();
   // console.log(courses);
-
+ const categories=await getCategories();
+//  console.log(categories);
 
   return (
     <>
@@ -135,7 +94,8 @@ const  HomePage = async() => {
               >
                 <div className="flex  flex-col gap-4 items-center justify-between rounded-md p-6">
                   <Image
-                    src={category.thumbnail}
+                    // src={category.thumbnail}
+                    src={`/assets/images/categories/${category?.thumbnail}`}
                     alt={category.title}
                     width={100}
                     height={100}
