@@ -12,7 +12,7 @@ const SingleCoursePage = async ({ params }) => {
 
   const course = await getCourseDetails(id);
 
-  console.log(course);
+  // console.log(course);
 
   return (
     <>
@@ -22,14 +22,14 @@ const SingleCoursePage = async ({ params }) => {
         subtitle={course?.subtitle}
         thumbnail={course?.thumbnail}
       />
-      <CourseDetails />
+      <CourseDetails course={course} />
     {/* if have data then display if not then handle this  */}
       {
         course?.testimonials && <Testimonials testimonials={replaceMongoIdInArray(course?.testimonials)} />
       }
 
       <RelatedCourses />
-    </>
+    </> 
   );
 };
 
