@@ -1,7 +1,7 @@
 'use client'
 import Link from 'next/link';
-import React, { useState } from 'react';
-import Logo from './Logo';
+import React, { useEffect, useState } from 'react';
+// import Logo from './logo';
 import { cn } from '@/lib/utils';
 
 import { X } from 'lucide-react';
@@ -10,10 +10,18 @@ import { Menu } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import MobileNav from './mobile-nav';
+import { useSession, signOut } from 'next-auth/react';
+import Logo from './Logo';
 
 const MainNav = ({ items, children }) => {
-
+    const { data: session } = useSession();
     const [showMobileMenu, setShowMobileMenu] = useState(false);
+    const [loginSession, setLoginSession] = useState(null);
+
+    useEffect(() => {
+        console.log("Test information");
+        setLoginSession(session);
+    }, [session]);
 
 
 
@@ -47,98 +55,71 @@ const MainNav = ({ items, children }) => {
 
             </div>
 
-            <nav className="flex items-center gap-3">
-                <div className="items-center gap-3 hidden lg:flex">
+            <nav className='flex items-center gap-3'>
 
-                    <Link
-                        href="/login"
-                        className={cn(
-                            buttonVariants({ size: "sm" }),
-                            "px-4"
-                        )}
-                    >
-                        Login
-                    </Link>
+                {
+                    !loginSession && (
+                        <div className='items-center gap-3 hidden lg:flex'>
+                            <Link href='/login' className={cn(buttonVariants({ size: "sm" }), "px-4")}>
+                                Login
+                            </Link>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="outline" size="sm">Register</Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-56 mt-4">
+                                    <DropdownMenuItem className="cursor-pointer">
+                                        <Link href='/register/student'>Student</Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem className="cursor-pointer">
+                                        <Link href='/register/instructor'>Instructor</Link>
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
+                    )
+                }
 
-                    {/* Register Dropdown */}
+
+
+                {loginSession && (
                     <DropdownMenu>
-                        <DropdownMenuTrigger
-                            className={cn(
-                                buttonVariants({
-                                    variant: "outline",
-                                    size: "sm",
-                                })
-                            )}
-                        >
-                            Register
+                        <DropdownMenuTrigger asChild>
+                            <div className='cursor-pointer'>
+                                <Avatar>
+                                    <AvatarImage src="https://github.com/shadcn.png" alt="@ariyan" />
+                                    <AvatarFallback>CN</AvatarFallback>
+                                </Avatar>
+                            </div>
                         </DropdownMenuTrigger>
 
-                        <DropdownMenuContent
-                            align="end"
-                            className="w-56 mt-4"
-                        >
-                            <DropdownMenuItem className="cursor-pointer">
-                                <Link href="/register/student">Student</Link>
+                        <DropdownMenuContent align="end" className="w-56 mt-4">
+                            <DropdownMenuItem className="cursor-pointer" asChild>
+                                <Link href='account'>Profile</Link>
                             </DropdownMenuItem>
-
+                            <DropdownMenuItem className="cursor-pointer" asChild>
+                                <Link href='account/enrolled-courses'>My Courses</Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="cursor-pointer" asChild>
+                                <Link href=''>Testimonials & Certificates</Link>
+                            </DropdownMenuItem>
                             <DropdownMenuItem className="cursor-pointer">
-                                <Link href="/register/instructor">Instructor</Link>
+                                <div onClick={(e) => { e.preventDefault(); signOut(); }} className="flex items-center w-full cursor-pointer">Logout</div>
                             </DropdownMenuItem>
                         </DropdownMenuContent>
+
                     </DropdownMenu>
+                )}
 
-                </div>
 
-                {/* Profile Dropdown */}
-                <DropdownMenu>
-                    <DropdownMenuTrigger
-                        className="cursor-pointer rounded-full outline-none"
-                    >
-                        <Avatar>
-                            <AvatarImage
-                                src="https://github.com/shadcn.png"
-                                alt="@shafiul"
-                            />
-                            <AvatarFallback>EL</AvatarFallback>
-                        </Avatar>
-                    </DropdownMenuTrigger>
 
-                    <DropdownMenuContent
-                        align="end"
-                        className="w-56 mt-4"
-                    >
-                        <DropdownMenuItem className="cursor-pointer">
-                            <Link href="/account">
-                                Profile
-                            </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="cursor-pointer">
-                            <Link href="/account/enrolled-courses">
-                                My Courses
-                            </Link>
-                        </DropdownMenuItem>
 
-                        <DropdownMenuItem className="cursor-pointer">
-                            <Link href="">
-                                Testimonials & Certificates
-                            </Link>
-                        </DropdownMenuItem>
-
-                        <DropdownMenuItem className="cursor-pointer">
-                            <Link href="">
-                                Logout
-                            </Link>
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-
-                {/* Mobile Menu */}
-                <button
-                    className="flex items-center space-x-2 lg:hidden"
-                    onClick={() => setShowMobileMenu(!showMobileMenu)}
-                >
-                    {showMobileMenu ? <X /> : <Menu />} 
+                <button className='flex items-center space-x-2 lg:hidden' onClick={() => setShowMobileMenu(!showMobileMenu)}>
+                    {showMobileMenu ? <X /> : <Menu />}
                 </button>
+
+
+
             </nav>
 
         </>
