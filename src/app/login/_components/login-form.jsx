@@ -1,4 +1,7 @@
+'use client'
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -10,8 +13,39 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ceredntialLogin } from "@/app/actions";
+// import { ceredntialLogin } from "@/app/actions";
+
 
 export function LoginForm() {
+
+  const [error, setError] = useState('');
+  const router = useRouter();
+
+
+  async function onSubmit(event) {
+    event.preventDefault();
+
+    try {
+      const formData = new FormData(event.currentTarget);
+      const response = await ceredntialLogin(formData);
+
+      if (response?.error) {
+          console.log(response.error)
+          setError(response.error);
+      } else {
+        router.push("/courses")
+      }      
+    } catch (e) {
+      setError(e.message);
+    }
+  }
+
+
+
+
+
+
   return (
     <Card className="mx-auto max-w-sm w-full">
       <CardHeader>
@@ -27,11 +61,13 @@ export function LoginForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
+        <form onSubmit={onSubmit} >
         <div className="grid gap-4">
           <div className="grid gap-2">
             <Label htmlFor="email">Email</Label>
             <Input
               id="email"
+              name="email"
               type="email"
               placeholder="m@example.com"
               required
@@ -44,7 +80,7 @@ export function LoginForm() {
                 Forgot your password?
               </Link> */}
             </div>
-            <Input id="password" type="password" required />
+            <Input id="password" name="password" type="password" required />
           </div>
           <Button type="submit" className="w-full">
             Login
@@ -56,6 +92,7 @@ export function LoginForm() {
             Register
           </Link>
         </div>
+        </form>
       </CardContent>
     </Card>
   );
