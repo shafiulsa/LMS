@@ -1,67 +1,47 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { User } from "./model/user-model";
-import { dbConnect } from "./service/mongo";
-import bcrypt from "bcryptjs";
+import bcrypt from 'bcryptjs';
+import { authConfig } from "./auth.config";
 
-export const { 
+export const {
     handlers: { GET, POST },
     auth,
     signIn,
     signOut,
 } = NextAuth({
-    session: {
-        strategy: "jwt",
-    },
+    ...authConfig,
     providers: [
         CredentialsProvider({
             async authorize(credentials) {
-                if (!credentials) return null;
+                if (credentials == null) return null;
 
                 try {
-                    await dbConnect();
-                    const user = await User.findOne({ email: credentials?.email }).lean();
-                    console.log("Found user:", user);
+                    const user = await User.findOne({ email: credentials?.email });
+                    console.log(user);
 
-                    if (!user) {
+                    if (user) {
+                        const isMatch = await bcrypt.compare(credentials.password, user.password)
+
+                        if (isMatch) {
+                            return user;
+                        } else {
+                            console.error("Password Mismatch");
+                            throw new Error("Check your password");
+                        }
+
+                    } else {
                         console.error("User not found");
                         throw new Error("User not found");
                     }
 
-                    const isMatch = await bcrypt.compare(credentials.password, user.password);
-
-                    if (!isMatch) {
-                        console.error("Password Mismatch");
-                        throw new Error("Check your password");
-                    }
-
-                    return {
-                        id: user._id.toString(),
-                        name: `${user.firstName} ${user.lastName}`,
-                        email: user.email,
-                        role: user.role,
-                    };
                 } catch (err) {
-                    console.error("Authorize error:", err);
-                    throw err;
+                    console.error(err);
+                    throw new Error(err);
                 }
-            },
-        }),
-    ],
-    callbacks: {
-        async jwt({ token, user }) {
-            if (user) {
-                token.role = user.role;
-                token.id = user.id;
+
             }
-            return token;
-        },
-        async session({ session, token }) {
-            if (token && session.user) {
-                session.user.role = token.role;
-                session.user.id = token.id;
-            }
-            return session;
-        },
-    },
-});
+        })
+
+    ]
+})
