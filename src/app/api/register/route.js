@@ -29,7 +29,7 @@ export const POST = async (request) => {
     } catch (error) {
         console.log(error);
         return new NextResponse(error.message, {
-            status: 201,
+            status: 500,
         });
     }
 

@@ -16,12 +16,8 @@ const SingleCoursePage = async ({ params }) => {
 
   return (
     <>
-
-      <CourseDetailsIntro
-        title={course?.title}
-        subtitle={course?.subtitle}
-        thumbnail={course?.thumbnail}
-      />
+      <CourseDetailsIntro course={course} />
+      
       <CourseDetails course={course} />
     {/* if have data then display if not then handle this  */}
       {
