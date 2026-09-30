@@ -10,7 +10,7 @@ import { getCourseDetailsByInstructor } from '../../../../../../queries/courses'
 const CourseInstructor = async ({course}) => {
   const instructor = course?.instructor;
   const fullName = `${instructor?.firstName} ${instructor?.lastName}`
-  console.log(course);
+    // console.log(course);
 
 
   const courseDetailsByInstructor = await getCourseDetailsByInstructor(instructor._id.toString());

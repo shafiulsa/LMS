@@ -9,7 +9,9 @@ const EnrollCourse = ({ asLink, courseId }) => {
 
     const formAction = async (data) => {
         const { url } = await createCheckoutSession(data);
-        window.location.assign(url);
+        if (url) {
+            window.location.assign(url);
+        }
     }
 
     return (

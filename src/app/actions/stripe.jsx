@@ -3,10 +3,25 @@ import { headers } from "next/headers";
 const CURRENCY = "USD";
 import { formatAmountForStripe } from "@/lib/stripe-helpers";
 import { stripe } from "@/lib/stripe";
+import { getCourseDetails } from "../../../queries/courses";
 
 export async function createCheckoutSession(data){
     const ui_mode = "hosted_page";
     const headerList = await headers();
+    const courseId = typeof data?.get === "function" ? data.get("courseId") : data?.courseId;
+
+    if (!courseId) {
+        throw new Error("Course ID is required");
+    }
+
+    const course = await getCourseDetails(courseId);
+
+    if(!course){
+        throw new Error("Course not found");
+    }
+    const courseName = course?.title;
+    const coursePrice = course?.price;  
+
     const origin = headerList.get("origin") || "http://localhost:3000";
 
     const checkoutSession = await stripe.checkout.sessions.create({
@@ -19,15 +34,15 @@ export async function createCheckoutSession(data){
                     currency: CURRENCY,
 
                     product_data: {
-                        name: "How to become good programmer",
+                        name:courseName,
                     },
-                    unit_amount: formatAmountForStripe(19,CURRENCY)
+                    unit_amount: formatAmountForStripe(coursePrice,CURRENCY)
                 },
             },
         ],
 
         ...(ui_mode === "hosted_page" && {
-            success_url: `${origin}/enroll-success?session_id={CHECKOUT_SESSION_ID}&courseId=65656`,
+            success_url: `${origin}/enroll-success?session_id={CHECKOUT_SESSION_ID}&courseId=${courseId}`,
             cancel_url: `${origin}/courses`
         }),
 
