@@ -35,8 +35,8 @@ const MobileNav = ({ items, children }) => {
                         Login
                     </Link>
                     <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="outline" size="sm">Register</Button>
+                        <DropdownMenuTrigger className={cn(buttonVariants({ variant: "outline", size: "sm" }))}>
+                            Register
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-56 mt-4">
                             <DropdownMenuItem className="cursor-pointer">

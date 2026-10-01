@@ -64,8 +64,8 @@ const MainNav = ({ items, children }) => {
                                 Login
                             </Link>
                             <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="outline" size="sm">Register</Button>
+                                <DropdownMenuTrigger className={cn(buttonVariants({ variant: "outline", size: "sm" }))}>
+                                    Register
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end" className="w-56 mt-4">
                                     <DropdownMenuItem className="cursor-pointer">
@@ -84,26 +84,24 @@ const MainNav = ({ items, children }) => {
 
                 {loginSession && (
                     <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <div className='cursor-pointer'>
-                                <Avatar>
-                                    <AvatarImage src="https://github.com/shadcn.png" alt="@ariyan" />
-                                    <AvatarFallback>CN</AvatarFallback>
-                                </Avatar>
-                            </div>
+                        <DropdownMenuTrigger className='cursor-pointer outline-none'>
+                            <Avatar>
+                                <AvatarImage src="https://github.com/shadcn.png" alt="@ariyan" />
+                                <AvatarFallback>CN</AvatarFallback>
+                            </Avatar>
                         </DropdownMenuTrigger>
 
                         <DropdownMenuContent align="end" className="w-56 mt-4">
-                            <DropdownMenuItem className="cursor-pointer" asChild>
+                            <DropdownMenuItem className="cursor-pointer">
                                 <Link href='/account'>Profile</Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="cursor-pointer" asChild>
+                            <DropdownMenuItem className="cursor-pointer">
                                 <Link href='/account/enrolled-courses'>My Courses</Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="cursor-pointer" asChild>
+                            <DropdownMenuItem className="cursor-pointer">
                                 <Link href='/account/my-certificates'>My Certificates</Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="cursor-pointer" asChild>
+                            <DropdownMenuItem className="cursor-pointer">
                                 <Link href='/account/my-testimonials'>My Testimonials</Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem className="cursor-pointer">
