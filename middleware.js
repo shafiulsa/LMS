@@ -5,26 +5,27 @@ import { PUBLIC_ROUTES, LOGIN, ROOT } from "@/lib/routes";
 
 const { auth } = NextAuth(authConfig);
 
-const middleware = auth((req) => {
-    const { nextUrl } = req;
-    const isAuthenticated = !!req.auth;
+export default auth((req) => {
+  const { nextUrl } = req;
+  const isAuthenticated = !!req.auth;
 
-    const isPublicRoute =
-        PUBLIC_ROUTES.some((route) => nextUrl.pathname.startsWith(route)) ||
-        nextUrl.pathname === ROOT;
+  // নিখুঁতভাবে চেক করা: রুটটি হুবহু এক হতে হবে অথবা সাব-পাথ (যেমন /courses/123) হতে হবে
+  const isPublicRoute =
+    PUBLIC_ROUTES.some((route) => {
+      return nextUrl.pathname === route || nextUrl.pathname.startsWith(`${route}/`);
+    }) || nextUrl.pathname === ROOT;
 
-    if (!isAuthenticated && !isPublicRoute) {
-        return NextResponse.redirect(new URL(LOGIN, nextUrl));
-    }
-    return NextResponse.next();
+  // লগইন না থাকলে এবং পাবলিক রুট না হলে সরাসরি /login এ পাঠিয়ে দিবে
+  if (!isAuthenticated && !isPublicRoute) {
+    return NextResponse.redirect(new URL(LOGIN, nextUrl));
+  }
+
+  return NextResponse.next();
 });
 
-export default middleware;
-export { middleware };
-
 export const config = {
-    matcher: [
-      "/((?!api/auth|_next|favicon.ico|.*\\..*).*)",
-      "/",
-    ],
+  matcher: [
+    "/((?!api/auth|_next|favicon.ico|.*\\..*).*)",
+    "/",
+  ],
 };

@@ -64,15 +64,15 @@ const MainNav = ({ items, children }) => {
                                 Login
                             </Link>
                             <DropdownMenu>
-                                <DropdownMenuTrigger className={cn(buttonVariants({ variant: "outline", size: "sm" }))}>
-                                    Register
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="outline" size="sm">Register</Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end" className="w-56 mt-4">
                                     <DropdownMenuItem className="cursor-pointer">
-                                        <Link href='/register/student' className="w-full">Student</Link>
+                                        <Link href='/register/student'>Student</Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem className="cursor-pointer">
-                                        <Link href='/register/instructor' className="w-full">Instructor</Link>
+                                        <Link href='/register/instructor'>Instructor</Link>
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
@@ -84,22 +84,27 @@ const MainNav = ({ items, children }) => {
 
                 {loginSession && (
                     <DropdownMenu>
-                        <DropdownMenuTrigger className='cursor-pointer rounded-full outline-none'>
-                            <Avatar>
-                                <AvatarImage src="https://github.com/shadcn.png" alt="@ariyan" />
-                                <AvatarFallback>CN</AvatarFallback>
-                            </Avatar>
+                        <DropdownMenuTrigger asChild>
+                            <div className='cursor-pointer'>
+                                <Avatar>
+                                    <AvatarImage src="https://github.com/shadcn.png" alt="@ariyan" />
+                                    <AvatarFallback>CN</AvatarFallback>
+                                </Avatar>
+                            </div>
                         </DropdownMenuTrigger>
 
                         <DropdownMenuContent align="end" className="w-56 mt-4">
-                            <DropdownMenuItem className="cursor-pointer">
-                                <Link href='/account' className="w-full">Profile</Link>
+                            <DropdownMenuItem className="cursor-pointer" asChild>
+                                <Link href='/account'>Profile</Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="cursor-pointer">
-                                <Link href='/account/enrolled-courses' className="w-full">My Courses</Link>
+                            <DropdownMenuItem className="cursor-pointer" asChild>
+                                <Link href='/account/enrolled-courses'>My Courses</Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="cursor-pointer">
-                                <Link href='#' className="w-full">Testimonials & Certificates</Link>
+                            <DropdownMenuItem className="cursor-pointer" asChild>
+                                <Link href='/account/my-certificates'>My Certificates</Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="cursor-pointer" asChild>
+                                <Link href='/account/my-testimonials'>My Testimonials</Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem className="cursor-pointer">
                                 <div onClick={(e) => { e.preventDefault(); signOut(); }} className="flex items-center w-full cursor-pointer">Logout</div>
