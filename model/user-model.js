@@ -45,5 +45,10 @@ const userSchema = new Schema({
         type: String,
         default: ""
     },
+    website: {
+        required: false,
+        type: String,
+        default: ""
+    },
 });
 export const User = mongoose.models.User ?? mongoose.model("User", userSchema);
