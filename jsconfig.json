@@ -2,7 +2,9 @@
   "compilerOptions": {
     "paths": {
       "@/*": ["./src/*"],
-      "@/auth": ["./src/auth.js", "./auth.js"]
+      "@/auth": ["./src/auth.js", "./auth.js"],
+      "@/model/*": ["./model/*"],
+      "@/queries/*": ["./queries/*"]
     }
   }
 }
