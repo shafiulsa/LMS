@@ -14,30 +14,40 @@ import { Label } from "@/components/ui/label";
 import { ceredntialLogin } from "@/app/actions";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 export function LoginForm() {
 
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
 
   async function onSubmit(event) {
     event.preventDefault();
+    setLoading(true);
+    setError('');
 
     try {
       const formData = new FormData(event.currentTarget);
       const response = await ceredntialLogin(formData);
 
       if (!!response.error) {
-        console.log(response.error)
+        console.log(response.error);
         setError(response.error);
+        toast.error(response.error);
       } else {
-        router.push("/courses")
+        toast.success("Login successful");
+        router.push("/courses");
       }
     } catch (e) {
-      setError(e.message);
+      const errorMsg = e.message || "Login failed. Please try again.";
+      setError(errorMsg);
+      toast.error(errorMsg);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -102,7 +112,13 @@ export function LoginForm() {
                 </button>
               </div>
             </div>
-            <Button type="submit" className="w-full">
+            {error && (
+              <p className="text-sm font-medium text-destructive text-center">
+                {error}
+              </p>
+            )}
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Login
             </Button>
           </div>

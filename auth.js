@@ -3,6 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { User } from "./model/user-model";
 import bcrypt from 'bcryptjs';
 import { authConfig } from "./auth.config";
+import { dbConnect } from "./service/mongo";
 
 export const {
     handlers: { GET, POST },
@@ -17,6 +18,7 @@ export const {
                 if (credentials == null) return null;
 
                 try {
+                    await dbConnect();
                     const user = await User.findOne({ email: credentials?.email });
                     //console.log(user);
 
@@ -27,17 +29,17 @@ export const {
                             return user;
                         } else {
                             console.error("Password Mismatch");
-                            throw new Error("Check your password");
+                            throw new Error("Incorrect password. Please try again.");
                         }
 
                     } else {
                         console.error("User not found");
-                        throw new Error("User not found");
+                        throw new Error("No user found with this email address.");
                     }
 
                 } catch (err) {
                     console.error(err);
-                    throw new Error(err);
+                    throw new Error(err.message || err);
                 }
 
             }

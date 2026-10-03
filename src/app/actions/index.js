@@ -13,7 +13,11 @@ export async function ceredntialLogin(formData) {
         return { success: true, response };
     } catch (error) {
         if (error instanceof AuthError) {
-            return { error: error.cause?.err?.message || "Invalid credentials." };
+            let message = error.cause?.err?.message || error.cause?.message || "Invalid credentials.";
+            if (typeof message === "string") {
+                message = message.replace(/^Error:\s*/, "");
+            }
+            return { error: message };
         }
         return { error: error.message || "Something went wrong." };
     }
