@@ -1,111 +1,131 @@
-import { Course } from "../model/course-model";
-import { Category } from "../model/category-model";
-import { User } from "../model/user-model";
-import { Testimonial } from "../model/testimonial-model";
-import { Module } from "../model/module-model";
+import { Category } from "@/model/category-model";
+import { Course } from "@/model/course-model";
+// import { Module } from "@/model/module.model";
+import { Testimonial } from "@/model/testimonial-model";
+import { User } from "@/model/user-model";
 import { replaceMongoIdInArray, replaceMongoIdInObject } from "@/lib/convertData";
-import { getTestimonialsForCourse } from "./testimonials";
 import { getEnrollmentsForCourse } from "./enrollments";
-
+import { getTestimonialsForCourse } from "./testimonials";
+import { Module } from "@/model/module-model";
 
 export async function getCourseList() {
-  const courses= await Course.find({}).select(["title","subtitle","thumbnail","modules","price","category","instructor"]).populate({
+  const courses = await Course.find({}).select(["title", "subtitle", "thumbnail", "modules", "price", "category", "instructor"]).populate({
     path: "category",
-    model: Category,
+    model: Category
   }).populate({
     path: "instructor",
-    model: User,
+    model: User
   }).populate({
     path: "testimonials",
-    model: Testimonial,
+    model: Testimonial
   }).populate({
     path: "modules",
-    model: Module,
+    model: Module
   }).lean();
   return replaceMongoIdInArray(courses);
-}  
+}
 
 
 export async function getCourseDetails(id) {
-  if (!id) return null;
   const course = await Course.findById(id)
-  .populate({
+    .populate({
       path: "category",
       model: Category
-  }).populate({
+    }).populate({
       path: "instructor",
       model: User
-  }).populate({
+    }).populate({
       path: "testimonials",
       model: Testimonial,
       populate: {
-          path: "user",
-          model: User
+        path: "user",
+        model: User
       }
-  }).populate({
+    }).populate({
       path: "modules",
       model: Module
-  }).lean();
+    }).lean();
   return replaceMongoIdInObject(course);
-}  
+}
 
 
-export async function getCourseDetailsByInstructor(instructorId){
-    const courses = await Course.find({instructor: instructorId })
-    .populate({path: "category", model: Category })
-    .populate({ path: "instructor", model: User})
+function groupBy(array, keyFn) {
+  return array.reduce((acc, item) => {
+    const key = keyFn(item);
+    if (!acc[key]) {
+      acc[key] = [];
+    }
+    acc[key].push(item);
+    return acc
+  }, {});
+}
+
+
+export async function getCourseDetailsByInstructor(instructorId) {
+  const courses = await Course.find({ instructor: instructorId })
+    .populate({ path: "category", model: Category })
+    .populate({ path: "instructor", model: User })
     .lean();
 
-    const enrollments = await Promise.all(
-        courses.map(async (course) => {
-            const enrollment = await getEnrollmentsForCourse(course.
-                _id.toString());
-                return enrollment;
-        })
-    );
+  const enrollments = await Promise.all(
+    courses.map(async (course) => {
+      const enrollment = await getEnrollmentsForCourse(course.
+        _id.toString());
+      return enrollment;
+    })
+  );
 
-    const totalEnrollments = enrollments.reduce(( acc, obj )=> {
-        return acc + obj.length;
-    },0);
-    
-    const tesimonials = await Promise.all(
-        courses.map(async (course) => {
-            const tesimonial = await getTestimonialsForCourse(course.
-                _id.toString());
-                return tesimonial;
-        })
-    );
 
-    const totalTestimonials = tesimonials.flat();
-    const avgRating = totalTestimonials.length > 0
-        ? (totalTestimonials.reduce(function (acc, obj) {
-            return acc + obj.rating;
-        }, 0)) / totalTestimonials.length
-        : 0; 
 
-    const instructor = (courses.length > 0 && courses[0]?.instructor)
-        ? courses[0]?.instructor
-        : await User.findById(instructorId).lean();
+  // Group enrollments by course
+  const groupByCourses = groupBy(enrollments.flat(), (item) => item.course);
 
-    const firstName = instructor?.firstName || "Unknown";
-    const lastName = instructor?.lastName || "";
-    const fullInsName = `${firstName} ${lastName}`.trim();
+  /// Calculate total revenue 
+  const totalRevenue = courses.reduce((acc, course) => {
+    const enrollmentsForCourse = groupByCourses[course._id] || [];
+    return acc + enrollmentsForCourse.length * course.price;
+  }, 0);
 
-    const Designation = instructor?.designation || "Unknown"; 
+  console.log(totalRevenue);
 
-    const insImage = instructor?.profilePicture || "Unknown"; 
+  const totalEnrollments = enrollments.reduce((acc, obj) => {
+    return acc + obj.length;
+  }, 0);
 
-    const bio = instructor?.bio || "";
+  const tesimonials = await Promise.all(
+    courses.map(async (course) => {
+      const tesimonial = await getTestimonialsForCourse(course.
+        _id.toString());
+      return tesimonial;
+    })
+  );
 
-    return {
-        "courses" : courses.length,
-        "enrollments": totalEnrollments,
-        "reviews" : totalTestimonials.length,
-        "ratings" : avgRating ? avgRating.toPrecision(2) : 0,
-        "inscourses" : courses,
-        fullInsName,
-        Designation,
-        insImage,
-        bio
-    } 
+  const totalTestimonials = tesimonials.flat();
+  const avgRating = (totalTestimonials.reduce(function (acc, obj) {
+    return acc + obj.rating;
+  }, 0)) / totalTestimonials.length;
+
+  const firstName = courses.length > 0 ? courses[0]?.instructor?.
+    firstName : "Unknown";
+  const lastName = courses.length > 0 ? courses[0]?.instructor?.
+    lastName : "Unknown";
+  const fullInsName = `${firstName} ${lastName}`;
+
+  const Designation = courses.length > 0 ? courses[0]?.instructor?.
+    designation : "Unknown";
+
+  const insImage = courses.length > 0 ? courses[0]?.instructor?.
+    profilePicture : "Unknown";
+
+  return {
+    "courses": courses.length,
+    "enrollments": totalEnrollments,
+    "reviews": totalTestimonials.length,
+    "ratings": avgRating.toPrecision(2),
+    "inscourses": courses,
+    "revenue": totalRevenue,
+    fullInsName,
+    Designation,
+    insImage
+  }
 }
