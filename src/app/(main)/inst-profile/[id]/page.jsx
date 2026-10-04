@@ -13,34 +13,12 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-
-const courses = [
-  {
-    id: 1,
-    title: "Design",
-    thumbnail: "/assets/images/categories/design.jpg",
-  },
-
-  {
-    id: 3,
-    title: "Development",
-    thumbnail: "/assets/images/categories/development.jpg",
-  },
-  {
-    id: 4,
-    title: "Marketing",
-    thumbnail: "/assets/images/categories/marketing.jpg",
-  },
-];
-
+ 
 const InstructorProfile = async ({ params }) => {
   const { id } = await params;
-
   const courseDetailsByInstructor = await getCourseDetailsByInstructor(id);
-  // ...
 
-  console.log(courseDetailsByInstructor);
-
+ 
   return (
     <section id="categories" className="space-y-6  py-6  lg:py-12">
       <div className="container grid grid-cols-12 lg:gap-x-8 gap-y-8">
@@ -85,55 +63,52 @@ const InstructorProfile = async ({ params }) => {
                 </ul>
               </div>
             </div>
-            <p className="text-gray-600 text-xs leading-[1.8] text-justify">
-            Hi! I'm Kazi Ariyan. I'm a web developer with a serious love for teaching I am a founder of easy Learning and a passionate Web Developer, Programmer & Instructor. 
-<br/>
-I am working online for the last 9 years and have created several successful websites running on the internet. I try to create a project-based course that helps you to learn professionally and make you fell as a complete developer. easy learning exists to help you succeed in life.  
- 
+            <p className="text-gray-600 text-xs leading-[1.8] text-justify whitespace-pre-line">
+              {courseDetailsByInstructor?.bio}
             </p>
           </div>
         </div>
-
-
         {/* Courses */}
         <div className="col-span-12 lg:col-span-8">
           <div>
             <SectionTitle className="mb-6">Courses</SectionTitle>
             <div className="grid sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-              {courses.map((category) => {
+              {Array.isArray(courseDetailsByInstructor?.inscourses) && 
+
+              courseDetailsByInstructor?.inscourses.map((course) => {
                 return (
-                  <Link key={category.id} href={`/courses/${category.id}`}>
+                  <Link key={course._id} href={`/courses/${course._id}`}>
                     <div className="group hover:shadow-sm transition overflow-hidden border rounded-lg p-3 h-full">
                       <div className="relative w-full aspect-video rounded-md overflow-hidden">
                         <Image
-                          src="/assets/images/courses/course_1.png"
-                          alt={"course"}
+                          src={`/assets/images/courses/${course?.thumbnail}`}
+                          alt={course.title}
                           className="object-cover"
                           fill
                         />
                       </div>
                       <div className="flex flex-col pt-2">
                         <div className="text-lg md:text-base font-medium group-hover:text-sky-700 line-clamp-2">
-                          Reactive Accelerator
+                        {course?.title}
                         </div>
                         <p className="text-xs text-muted-foreground">
-                          Development
+                        {course?.category?.title}
                         </p>
                         <div className="my-3 flex items-center gap-x-2 text-sm md:text-xs">
                           <div className="flex items-center gap-x-1 text-slate-500">
                             <div>
                               <BookOpen className="w-4" />
                             </div>
-                            <span>4 Chapters</span>
+                            <span>{course?.modules?.length} Chapters</span>
                           </div>
                         </div>
 
-
-
+                       
+                       
 
                         <div className="flex items-center justify-between mt-4">
                           <p className="text-md md:text-sm font-medium text-slate-700">
-                            {formatPrice(49)}
+                            {formatPrice(course?.price)}
                           </p>
 
                           <Button

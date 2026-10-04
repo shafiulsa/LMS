@@ -50,38 +50,62 @@ export async function getCourseDetails(id) {
 }  
 
 
-export async function getCourseDetailsByInstructor(instructorId){ 
-  const courses = await Course.find({instructor: instructorId }).lean();
+export async function getCourseDetailsByInstructor(instructorId){
+    const courses = await Course.find({instructor: instructorId })
+    .populate({path: "category", model: Category })
+    .populate({ path: "instructor", model: User})
+    .lean();
 
-  const enrollments = await Promise.all(
-      courses.map(async (course) => {
-          const enrollment = await getEnrollmentsForCourse(course.
-              _id.toString());
-              return enrollment;
-      }) 
-  );
+    const enrollments = await Promise.all(
+        courses.map(async (course) => {
+            const enrollment = await getEnrollmentsForCourse(course.
+                _id.toString());
+                return enrollment;
+        })
+    );
 
-  const totalEnrollments = enrollments.reduce(( item, currentValue )=> {
-      return item.length + currentValue.length;
-  });
-  
-  const tesimonials = await Promise.all(
-      courses.map(async (course) => {
-          const tesimonial = await getTestimonialsForCourse(course.
-              _id.toString());
-              return tesimonial;
-      })
-  );
+    const totalEnrollments = enrollments.reduce(( acc, obj )=> {
+        return acc + obj.length;
+    },0);
+    
+    const tesimonials = await Promise.all(
+        courses.map(async (course) => {
+            const tesimonial = await getTestimonialsForCourse(course.
+                _id.toString());
+                return tesimonial;
+        })
+    );
 
-  const totalTestimonials = tesimonials.flat();
-  const avgRating = (totalTestimonials.reduce(function (acc, obj) {
-      return acc + obj.rating;
-  },0)) / totalTestimonials.length; 
+    const totalTestimonials = tesimonials.flat();
+    const avgRating = totalTestimonials.length > 0
+        ? (totalTestimonials.reduce(function (acc, obj) {
+            return acc + obj.rating;
+        }, 0)) / totalTestimonials.length
+        : 0; 
 
-  return {
-      "courses" : courses.length,
-      "enrollments": totalEnrollments,
-      "reviews" : totalTestimonials.length,
-      "ratings" : avgRating.toPrecision(2)
-  } 
+    const instructor = (courses.length > 0 && courses[0]?.instructor)
+        ? courses[0]?.instructor
+        : await User.findById(instructorId).lean();
+
+    const firstName = instructor?.firstName || "Unknown";
+    const lastName = instructor?.lastName || "";
+    const fullInsName = `${firstName} ${lastName}`.trim();
+
+    const Designation = instructor?.designation || "Unknown"; 
+
+    const insImage = instructor?.profilePicture || "Unknown"; 
+
+    const bio = instructor?.bio || "";
+
+    return {
+        "courses" : courses.length,
+        "enrollments": totalEnrollments,
+        "reviews" : totalTestimonials.length,
+        "ratings" : avgRating ? avgRating.toPrecision(2) : 0,
+        "inscourses" : courses,
+        fullInsName,
+        Designation,
+        insImage,
+        bio
+    } 
 }
