@@ -1,7 +1,7 @@
 'use client'
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
-// import Logo from './logo';
+import Logo from './Logo';
 import { cn } from '@/lib/utils';
 
 import { X } from 'lucide-react';
@@ -11,16 +11,27 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import MobileNav from './mobile-nav';
 import { useSession, signOut } from 'next-auth/react';
-import Logo from './Logo';
 
 const MainNav = ({ items, children }) => {
     const { data: session } = useSession();
     const [showMobileMenu, setShowMobileMenu] = useState(false);
     const [loginSession, setLoginSession] = useState(null);
 
+    const [loggedInUser, setLoggedInUser] = useState(null);
+
     useEffect(() => {
-        console.log("Test information");
         setLoginSession(session);
+        async function fetchMe() {
+            try {
+                const response = await fetch("/api/me");
+                const data = await response.json();
+                // console.log(data);
+                setLoggedInUser(data);
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        fetchMe();
     }, [session]);
 
 
@@ -64,8 +75,8 @@ const MainNav = ({ items, children }) => {
                                 Login
                             </Link>
                             <DropdownMenu>
-                                <DropdownMenuTrigger className={cn(buttonVariants({ variant: "outline", size: "sm" }))}>
-                                    Register
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="outline" size="sm">Register</Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end" className="w-56 mt-4">
                                     <DropdownMenuItem className="cursor-pointer">
@@ -84,28 +95,36 @@ const MainNav = ({ items, children }) => {
 
                 {loginSession && (
                     <DropdownMenu>
-                        <DropdownMenuTrigger className='cursor-pointer outline-none'>
-                            <Avatar>
-                                <AvatarImage src="https://github.com/shadcn.png" alt="@ariyan" />
-                                <AvatarFallback>CN</AvatarFallback>
-                            </Avatar>
+                        <DropdownMenuTrigger asChild>
+                            <div className='cursor-pointer'>
+                                <Avatar>
+                                    <AvatarImage src={loggedInUser?.profilePicture} alt="@ariyan" />
+                                    <AvatarFallback>CN</AvatarFallback>
+                                </Avatar>
+                            </div>
                         </DropdownMenuTrigger>
 
                         <DropdownMenuContent align="end" className="w-56 mt-4">
-                            <DropdownMenuItem className="cursor-pointer">
+                            <DropdownMenuItem className="cursor-pointer" asChild>
                                 <Link href='/account'>Profile</Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="cursor-pointer">
+
+                            {loggedInUser?.role === "instructor" && (
+                                <DropdownMenuItem className="cursor-pointer" asChild>
+                                    <Link href='/dashboard'> <strong>Instructor Dashboard</strong> </Link>
+                                </DropdownMenuItem>
+                            )}
+
+
+
+                            <DropdownMenuItem className="cursor-pointer" asChild>
                                 <Link href='/account/enrolled-courses'>My Courses</Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="cursor-pointer">
-                                <Link href='/account/my-certificates'>My Certificates</Link>
+                            <DropdownMenuItem className="cursor-pointer" asChild>
+                                <Link href=''>Testimonials & Certificates</Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="cursor-pointer">
-                                <Link href='/account/my-testimonials'>My Testimonials</Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="cursor-pointer">
-                                <div onClick={(e) => { e.preventDefault(); signOut(); }} className="flex items-center w-full cursor-pointer">Logout</div>
+                            <DropdownMenuItem className="cursor-pointer" asChild>
+                                <Link href='' onClick={(e) => { e.preventDefault(); signOut(); }} >Logout</Link>
                             </DropdownMenuItem>
                         </DropdownMenuContent>
 
