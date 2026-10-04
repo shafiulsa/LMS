@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "emcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://darkgrey-tarsier-552512.hostingersite.com/wp-json/mcp/emcp-tools-server"
+      ]
+    }
+  }
+}
