@@ -14,9 +14,19 @@ function Dialog({
 }
 
 function DialogTrigger({
+  asChild,
+  render,
+  children,
   ...props
 }) {
-  return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />
+  const renderProp = render || (asChild ? children : undefined);
+  return (
+    <DialogPrimitive.Trigger
+      data-slot="dialog-trigger"
+      {...(renderProp ? { render: renderProp } : { children })}
+      {...props}
+    />
+  )
 }
 
 function DialogPortal({
@@ -26,9 +36,19 @@ function DialogPortal({
 }
 
 function DialogClose({
+  asChild,
+  render,
+  children,
   ...props
 }) {
-  return <DialogPrimitive.Close data-slot="dialog-close" {...props} />
+  const renderProp = render || (asChild ? children : undefined);
+  return (
+    <DialogPrimitive.Close
+      data-slot="dialog-close"
+      {...(renderProp ? { render: renderProp } : { children })}
+      {...props}
+    />
+  )
 }
 
 function DialogOverlay({

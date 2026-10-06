@@ -1,12 +1,11 @@
 import { Category } from "@/model/category-model";
 import { Course } from "@/model/course-model";
-// import { Module } from "@/model/module.model";
+import { Module } from "@/model/module-model";
 import { Testimonial } from "@/model/testimonial-model";
 import { User } from "@/model/user-model";
 import { replaceMongoIdInArray, replaceMongoIdInObject } from "@/lib/convertData";
 import { getEnrollmentsForCourse } from "./enrollments";
 import { getTestimonialsForCourse } from "./testimonials";
-import { Module } from "@/model/module-model";
 
 export async function getCourseList() {
   const courses = await Course.find({}).select(["title", "subtitle", "thumbnail", "modules", "price", "category", "instructor"]).populate({
@@ -24,7 +23,6 @@ export async function getCourseList() {
   }).lean();
   return replaceMongoIdInArray(courses);
 }
-
 
 export async function getCourseDetails(id) {
   const course = await Course.findById(id)
@@ -48,7 +46,6 @@ export async function getCourseDetails(id) {
   return replaceMongoIdInObject(course);
 }
 
-
 function groupBy(array, keyFn) {
   return array.reduce((acc, item) => {
     const key = keyFn(item);
@@ -56,12 +53,11 @@ function groupBy(array, keyFn) {
       acc[key] = [];
     }
     acc[key].push(item);
-    return acc
+    return acc;
   }, {});
 }
 
-
-export async function getCourseDetailsByInstructor(instructorId) {
+export async function getCourseDetailsByInstructor(instructorId, expand) {
   const courses = await Course.find({ instructor: instructorId })
     .populate({ path: "category", model: Category })
     .populate({ path: "instructor", model: User })
@@ -75,7 +71,7 @@ export async function getCourseDetailsByInstructor(instructorId) {
     })
   );
 
-
+ 
 
   // Group enrollments by course
   const groupByCourses = groupBy(enrollments.flat(), (item) => item.course);
@@ -86,7 +82,7 @@ export async function getCourseDetailsByInstructor(instructorId) {
     return acc + enrollmentsForCourse.length * course.price;
   }, 0);
 
-  console.log(totalRevenue);
+  //console.log(totalRevenue);
 
   const totalEnrollments = enrollments.reduce((acc, obj) => {
     return acc + obj.length;
@@ -116,6 +112,14 @@ export async function getCourseDetailsByInstructor(instructorId) {
 
   const insImage = courses.length > 0 ? courses[0]?.instructor?.
     profilePicture : "Unknown";
+
+  if (expand) {
+    return {
+      "courses": courses?.flat(),
+      "enrollments": enrollments?.flat(),
+      "reviews": totalTestimonials,
+    }
+  }
 
   return {
     "courses": courses.length,
