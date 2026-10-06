@@ -1,5 +1,6 @@
 "use client";
 
+import StarRating from "@/components/start-rating";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -40,6 +41,10 @@ export const columns = [
         </Button>
       );
     },
+  cell: ({row}) => {
+      const rating = row.getValue("rating");
+      return <div className="flex"><StarRating rating={rating} /> </div>
+    }, 
   },
   {
     accessorKey: "content",
