@@ -8,7 +8,7 @@ import { getEnrollmentsForCourse } from "./enrollments";
 import { getTestimonialsForCourse } from "./testimonials";
 
 export async function getCourseList() {
-  const courses = await Course.find({}).select(["title", "subtitle", "thumbnail", "modules", "price", "category", "instructor"]).populate({
+  const courses = await Course.find({active:true}).select(["title", "subtitle", "thumbnail", "modules", "price", "category", "instructor"]).populate({
     path: "category",
     model: Category
   }).populate({
@@ -132,4 +132,13 @@ export async function getCourseDetailsByInstructor(instructorId, expand) {
     Designation,
     insImage
   }
+}
+
+export async function create(courseData) {
+    try {
+        const course = await Course.create(courseData);
+        return JSON.parse(JSON.stringify(course));
+    } catch (error) {
+        throw new Error(error.message || error);
+    }
 }
