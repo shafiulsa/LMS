@@ -18,8 +18,8 @@ import { getCourseDetails } from "@/queries/courses";
 import { getCategories } from "@/queries/categories";
 import { SubTitleForm } from "./_components/subtitle-form";
 
-const EditCourse = async({params}) => {
-  const {courseId} = await params;
+const EditCourse = async ({ params }) => {
+  const { courseId } = await params;
   const course = await getCourseDetails(courseId);
   console.log(course);
   const categories = await getCategories();
@@ -31,7 +31,7 @@ const EditCourse = async({params}) => {
       id: c.id,
     }
   });
- // console.log(mappedCategories);
+  // console.log(mappedCategories);
   return (
     <>
       <AlertBanner
@@ -55,16 +55,16 @@ const EditCourse = async({params}) => {
               courseId={courseId}
             />
             <SubTitleForm
-            initialData={{
+              initialData={{
                 subtitle: course?.subtitle,
               }}
               courseId={courseId}
             />
-            <DescriptionForm initialData={{}} courseId={1} />
-            <ImageForm initialData={{}} courseId={1} />
-            <CategoryForm initialData={{}} courseId={1} />
+            <DescriptionForm initialData={{ description: course?.description }} courseId={courseId} />
+            <ImageForm initialData={{}} courseId={courseId} />
+            <CategoryForm initialData={{}} courseId={courseId} />
 
-            <QuizSetForm initialData={{}} courseId={1} />
+            <QuizSetForm initialData={{}} courseId={courseId} />
           </div>
           <div className="space-y-6">
             <div>
@@ -73,14 +73,14 @@ const EditCourse = async({params}) => {
                 <h2 className="text-xl">Course Modules</h2>
               </div>
 
-              <ModulesForm initialData={[]} courseId={[]} />
+              <ModulesForm initialData={[]} courseId={courseId} />
             </div>
             <div>
               <div className="flex items-center gap-x-2">
                 <IconBadge icon={CircleDollarSign} />
                 <h2 className="text-xl">Sell you course</h2>
               </div>
-              <PriceForm initialData={{}} courseId={1} />
+              <PriceForm initialData={{ price: course?.price }} courseId={courseId} />
             </div>
           </div>
         </div>
