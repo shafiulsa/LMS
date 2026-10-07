@@ -21,9 +21,9 @@ import { SubTitleForm } from "./_components/subtitle-form";
 const EditCourse = async ({ params }) => {
   const { courseId } = await params;
   const course = await getCourseDetails(courseId);
-  console.log(course);
+  // console.log(course);
   const categories = await getCategories();
-
+//console.log(categories);
   const mappedCategories = categories.map(c => {
     return {
       value: c.title,
@@ -62,7 +62,7 @@ const EditCourse = async ({ params }) => {
             />
             <DescriptionForm initialData={{ description: course?.description }} courseId={courseId} />
             <ImageForm initialData={{}} courseId={courseId} />
-            <CategoryForm initialData={{}} courseId={courseId} />
+            <CategoryForm initialData={{category:course?.category?.id}} courseId={courseId} options={mappedCategories}  />
 
             <QuizSetForm initialData={{}} courseId={courseId} />
           </div>
