@@ -61,8 +61,19 @@ const EditCourse = async ({ params }) => {
               courseId={courseId}
             />
             <DescriptionForm initialData={{ description: course?.description }} courseId={courseId} />
-            <ImageForm initialData={{}} courseId={courseId} />
-            <CategoryForm initialData={{category:course?.category?.id}} courseId={courseId} options={mappedCategories}  />
+            <ImageForm
+              initialData={{
+                imageUrl: course?.thumbnail ? `/assets/images/courses/${course.thumbnail}` : "",
+              }}
+              courseId={courseId}
+            />
+            <CategoryForm
+              initialData={{
+                value: course?.category?.title || "",
+              }}
+              courseId={courseId}
+              options={mappedCategories}
+            />
 
             <QuizSetForm initialData={{}} courseId={courseId} />
           </div>
