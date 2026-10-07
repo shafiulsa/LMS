@@ -16,6 +16,7 @@ import AlertBanner from "@/components/alert-banner";
 import { QuizSetForm } from "./_components/quiz-set-form";
 import { getCourseDetails } from "@/queries/courses";
 import { getCategories } from "@/queries/categories";
+import { SubTitleForm } from "./_components/subtitle-form";
 
 const EditCourse = async({params}) => {
   const {courseId} = await params;
@@ -50,6 +51,12 @@ const EditCourse = async({params}) => {
             <TitleForm
               initialData={{
                 title: course?.title,
+              }}
+              courseId={courseId}
+            />
+            <SubTitleForm
+            initialData={{
+                subtitle: course?.subtitle,
               }}
               courseId={courseId}
             />
