@@ -15,15 +15,18 @@ import { CourseActions } from "./_components/course-action";
 import AlertBanner from "@/components/alert-banner";
 import { QuizSetForm } from "./_components/quiz-set-form";
 import { getCourseDetails } from "@/queries/courses";
-import { getCategories } from "@/queries/categories";
 import { SubTitleForm } from "./_components/subtitle-form";
+import { getCategories } from "@/queries/categories";
+import { replaceMongoIdInArray } from "@/lib/convertData";
+import { ObjectId } from "mongoose";
 
 const EditCourse = async ({ params }) => {
   const { courseId } = await params;
+
   const course = await getCourseDetails(courseId);
-  // console.log(course);
   const categories = await getCategories();
-//console.log(categories);
+
+
   const mappedCategories = categories.map(c => {
     return {
       value: c.title,
@@ -32,6 +35,15 @@ const EditCourse = async ({ params }) => {
     }
   });
   // console.log(mappedCategories);
+
+  // Sanitize fucntion for handle ObjectID and Buffer 
+
+  const rawmodules = replaceMongoIdInArray(course?.modules).sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+  const modules = sanitizeData(rawmodules);
+
+
+
   return (
     <>
       <AlertBanner
@@ -61,21 +73,12 @@ const EditCourse = async ({ params }) => {
               courseId={courseId}
             />
             <DescriptionForm initialData={{ description: course?.description }} courseId={courseId} />
-            <ImageForm
-              initialData={{
-                imageUrl: course?.thumbnail ? `/assets/images/courses/${course.thumbnail}` : "",
-              }}
-              courseId={courseId}
-            />
-            <CategoryForm
-              initialData={{
-                value: course?.category?.title || "",
-              }}
-              courseId={courseId}
-              options={mappedCategories}
-            />
 
-            <QuizSetForm initialData={{}} courseId={courseId} />
+            <ImageForm initialData={{ imageUrl: `/assets/images/courses/${course?.thumbnail}` }} courseId={courseId} />
+
+            <CategoryForm initialData={{ value: course?.category?.title }} courseId={courseId} options={mappedCategories} />
+
+            <QuizSetForm initialData={{}} courseId={1} />
           </div>
           <div className="space-y-6">
             <div>
@@ -84,7 +87,7 @@ const EditCourse = async ({ params }) => {
                 <h2 className="text-xl">Course Modules</h2>
               </div>
 
-              <ModulesForm initialData={[]} courseId={courseId} />
+              <ModulesForm initialData={modules} courseId={courseId} />
             </div>
             <div>
               <div className="flex items-center gap-x-2">
@@ -99,4 +102,19 @@ const EditCourse = async ({ params }) => {
     </>
   );
 };
+// Sanitize function for handle ObjectID and Buffer
+function sanitizeData(data) {
+  return JSON.parse(
+    JSON.stringify(data, (key, value) => {
+      if (value instanceof ObjectId) {
+        return value.toString();
+      }
+      if (Buffer.isBuffer(value)) {
+        return value.toString("base64");
+      }
+      return value;
+    })
+  );
+}
+
 export default EditCourse;

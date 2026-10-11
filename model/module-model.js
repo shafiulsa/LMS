@@ -1,30 +1,34 @@
-import mongoose,{Schema} from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const moduleSchema = new Schema({
-    title:{
+    title: {
         required: true,
         type: String
     },
-    description:{
+    description: {
+        type: String
+    },
+    active: {
+        required: true,
+        default: false,
+        type: Boolean
+    },
+    slug: {
         required: true,
         type: String
     },
-    status:{
+    course: {
         required: true,
-        type: String
+        type: Schema.ObjectId,
     },
-    slug:{
+    lessonIds: {
         required: true,
-        type: String
+        type: [Schema.ObjectId]
     },
-    course:{
-        required: true,
-        type: String
-    },
-    lessonIds:{
-        required: true,
-        type: [String]
-    },
-     
+    order: {
+        require: true,
+        type: Number
+    }
+
 });
-export const Module = mongoose.models.Module ?? mongoose.model("Module",moduleSchema);
+export const Module = mongoose.models.Module ?? mongoose.model("Module", moduleSchema);
