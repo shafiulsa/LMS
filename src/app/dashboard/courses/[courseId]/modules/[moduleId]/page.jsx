@@ -12,18 +12,40 @@ import { ModuleTitleForm } from "./_components/module-title-form";
 import { LessonForm } from "./_components/lesson-form";
 import { CourseActions } from "../../_components/course-action";
 import { getModule } from "@/queries/modules";
-
+import { replaceMongoIdInArray } from "@/lib/convertData";
+import { ObjectId } from "mongodb";
 
 const Module = async ({ params }) => {
   const { courseId, moduleId } = await params;
-  const module = await getModule(moduleId); 
-  console.log({module})
+  const module = await getModule(moduleId);
+  //console.log(module); 
+   
+  // Sanitize fucntion for handle ObjectID and Buffer
+  function sanitizeData(data) {
+    return JSON.parse(
+      JSON.stringify(data, (key, value) => {
+        if (value instanceof ObjectId) {
+            return value.toString();
+        }
+        if (Buffer.isBuffer(value)) {
+          return value.toString("base64")
+        }
+        return value;
+      })
+    );
+  }
+  
+   const rawlessons = await replaceMongoIdInArray(module?.lessonIds).sort((a,b) => a.order - b.order);
+  
+   const lessons = sanitizeData(rawlessons);
+
   return (
     <>
       <AlertBanner
         label="This module is unpublished. It will not be visible in the course."
         variant="warning"
       />
+
       <div className="p-6">
         <div className="flex items-center justify-between">
           <div className="w-full">
@@ -31,7 +53,7 @@ const Module = async ({ params }) => {
               href={`/dashboard/courses/${courseId}`}
               className="flex items-center text-sm hover:opacity-75 transition mb-6"
             >
-              <ArrowLeft className="h-4 w-4 mr-2" /> 
+              <ArrowLeft className="h-4 w-4 mr-2" />
               Back to course setup
             </Link>
             <div className="flex items-center justify-end">
@@ -46,14 +68,14 @@ const Module = async ({ params }) => {
                 <IconBadge icon={LayoutDashboard} />
                 <h2 className="text-xl">Customize Your module</h2>
               </div>
-              <ModuleTitleForm initialData={{title: module?.title}} courseId={courseId} chapterId={moduleId} />
+              <ModuleTitleForm initialData={{title: module.title }} courseId={courseId} chapterId={moduleId} />
             </div>
             <div>
               <div className="flex items-center gap-x-2">
                 <IconBadge icon={BookOpenCheck} />
                 <h2 className="text-xl">Module Lessons</h2>
               </div>
-              <LessonForm />
+              <LessonForm initialData={lessons} moduleId={moduleId} /> 
             </div>
           </div>
           <div>
