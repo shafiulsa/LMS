@@ -34,3 +34,12 @@ export async function reOrderModules(data){
     }
 
 } 
+
+
+export async function updateModule(moduleId, data) {
+    try {
+        await Module.findByIdAndUpdate(moduleId,data);
+    } catch (error) {
+        throw new Error(e);
+    }
+}
