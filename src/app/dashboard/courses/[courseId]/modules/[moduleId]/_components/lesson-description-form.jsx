@@ -4,8 +4,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
-import { Editor } from "@/components/editor";
-import { Preview } from "@/components/preview";
+import { Textarea } from "@/components/ui/textarea";
+
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -19,6 +19,7 @@ import { Pencil } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { updateLesson } from "@/app/actions/lesson";
 
 const formSchema = z.object({
   description: z.string().min(1),
@@ -27,6 +28,8 @@ const formSchema = z.object({
 export const LessonDescriptionForm = ({ initialData, courseId, lessonId }) => {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
+
+  const [description, setDescription] = useState(initialData?.description);
 
   const toggleEdit = () => setIsEditing((current) => !current);
 
@@ -41,6 +44,8 @@ export const LessonDescriptionForm = ({ initialData, courseId, lessonId }) => {
 
   const onSubmit = async (values) => {
     try {
+      await updateLesson(lessonId, values);
+      setDescription(values.title);
       toast.success("Lesson updated");
       toggleEdit();
       router.refresh();
@@ -65,17 +70,7 @@ export const LessonDescriptionForm = ({ initialData, courseId, lessonId }) => {
         </Button>
       </div>
       {!isEditing && (
-        <div
-          className={cn(
-            "text-sm mt-2",
-            !initialData.description && "text-slate-500 italic"
-          )}
-        >
-          {!initialData.description && "No description"}
-          {initialData.description && (
-            <Preview value={initialData.description} />
-          )}
-        </div>
+        <p className="text-sm mt-2">{description}</p>
       )}
       {isEditing && (
         <Form {...form}>
@@ -89,7 +84,10 @@ export const LessonDescriptionForm = ({ initialData, courseId, lessonId }) => {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Editor {...field} />
+                    <Textarea disabled={isSubmitting}
+                      placeholder="e.g. 'This course is about...'"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
