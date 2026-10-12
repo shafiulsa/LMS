@@ -1,6 +1,6 @@
 "use client";
 
-export const VideoPlayer = ({ url }) => {
+export const VideoPlayer = ({url}) => {
   return (
     <div className="relative aspect-video">
       <iframe
@@ -14,4 +14,4 @@ export const VideoPlayer = ({ url }) => {
       ></iframe>
     </div>
   );
-}; 
+};
