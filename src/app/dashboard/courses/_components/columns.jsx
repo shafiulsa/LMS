@@ -62,11 +62,12 @@ export const columns = [
       );
     },
     cell: ({ row }) => {
-      const active = row.getValue("active") || false;
+      const active = row.getValue("active");
+      const isPublished = active === true || active === "true";
 
       return (
-        <Badge className={cn("bg-gray-500", active && "bg-green-600")}>
-          {active ? "Published" : "Unpublished"}
+        <Badge className={cn("bg-gray-500", isPublished && "bg-emerald-600")}>
+          {isPublished ? "Published" : "Draft"}
         </Badge>
       );
     },
