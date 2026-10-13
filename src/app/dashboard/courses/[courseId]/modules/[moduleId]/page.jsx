@@ -13,19 +13,23 @@ import { LessonForm } from "./_components/lesson-form";
 import { CourseActions } from "../../_components/course-action";
 import { getModule } from "@/queries/modules";
 import { replaceMongoIdInArray } from "@/lib/convertData";
-import { ObjectId } from "mongodb";
+import { ObjectId } from "mongoose";
+import { ModuleActions } from "./_components/module-action";
 
 const Module = async ({ params }) => {
   const { courseId, moduleId } = await params;
+
   const module = await getModule(moduleId);
+  const sanitizedModule = sanitizeData(module);
+
   //console.log(module); 
-   
+
   // Sanitize fucntion for handle ObjectID and Buffer
   function sanitizeData(data) {
     return JSON.parse(
       JSON.stringify(data, (key, value) => {
         if (value instanceof ObjectId) {
-            return value.toString();
+          return value.toString();
         }
         if (Buffer.isBuffer(value)) {
           return value.toString("base64")
@@ -34,17 +38,23 @@ const Module = async ({ params }) => {
       })
     );
   }
-  
-   const rawlessons = await replaceMongoIdInArray(module?.lessonIds).sort((a,b) => a.order - b.order);
-  
-   const lessons = sanitizeData(rawlessons);
+
+  const rawlessons = await replaceMongoIdInArray(module?.lessonIds).sort((a, b) => a.order - b.order);
+
+  const lessons = sanitizeData(rawlessons);
 
   return (
     <>
-      <AlertBanner
-        label="This module is unpublished. It will not be visible in the course."
-        variant="warning"
-      />
+
+      {
+        !(typeof module?.active === "string" ? module?.active === "true" : module?.active) && (
+          <AlertBanner
+            label="This module is unpublished. It will not be visible in the course."
+            variant="warning"
+          />
+        )
+      }
+
 
       <div className="p-6">
         <div className="flex items-center justify-between">
@@ -57,7 +67,7 @@ const Module = async ({ params }) => {
               Back to course setup
             </Link>
             <div className="flex items-center justify-end">
-              <CourseActions />
+              <ModuleActions module={sanitizedModule} courseId={courseId} />
             </div>
           </div>
         </div>
@@ -68,14 +78,14 @@ const Module = async ({ params }) => {
                 <IconBadge icon={LayoutDashboard} />
                 <h2 className="text-xl">Customize Your module</h2>
               </div>
-              <ModuleTitleForm initialData={{title: module.title }} courseId={courseId} chapterId={moduleId} />
+              <ModuleTitleForm initialData={{ title: module.title }} courseId={courseId} chapterId={moduleId} />
             </div>
             <div>
               <div className="flex items-center gap-x-2">
                 <IconBadge icon={BookOpenCheck} />
                 <h2 className="text-xl">Module Lessons</h2>
               </div>
-              <LessonForm initialData={lessons} moduleId={moduleId} courseId={courseId} /> 
+              <LessonForm initialData={lessons} moduleId={moduleId} courseId={courseId} />
             </div>
           </div>
           <div>

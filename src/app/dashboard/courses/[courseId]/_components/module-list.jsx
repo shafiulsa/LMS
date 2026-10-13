@@ -55,47 +55,50 @@ export const ModuleList = ({ items, onReorder, onEdit }) => {
       <Droppable droppableId="modules">
         {(provided) => (
           <div {...provided.droppableProps} ref={provided.innerRef}>
-            {modules.map((module, index) => (
-              <Draggable key={module.id} draggableId={module.id} index={index}>
-                {(provided) => (
-                  <div
-                    className={cn(
-                      "flex items-center gap-x-2 bg-slate-200 border-slate-200 border text-slate-700 rounded-md mb-4 text-sm",
-                      module.isPublished &&
-                        "bg-sky-100 border-sky-200 text-sky-700"
-                    )}
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                  >
+            {modules.map((module, index) => {
+              const isPublished = module.active === true || module.active === "true";
+              return (
+                <Draggable key={module.id} draggableId={module.id} index={index}>
+                  {(provided) => (
                     <div
                       className={cn(
-                        "px-2 py-3 border-r border-r-slate-200 hover:bg-slate-300 rounded-l-md transition",
-                        module.isPublished &&
-                          "border-r-sky-200 hover:bg-sky-200"
+                        "flex items-center gap-x-2 bg-slate-200 border-slate-200 border text-slate-700 rounded-md mb-4 text-sm",
+                        isPublished &&
+                          "bg-sky-100 border-sky-200 text-sky-700"
                       )}
-                      {...provided.dragHandleProps}
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
                     >
-                      <Grip className="h-5 w-5" />
-                    </div>
-                    {module.title}
-                    <div className="ml-auto pr-2 flex items-center gap-x-2">
-                      <Badge
+                      <div
                         className={cn(
-                          "bg-gray-500",
-                          module.isPublished && "bg-emerald-600"
+                          "px-2 py-3 border-r border-r-slate-200 hover:bg-slate-300 rounded-l-md transition",
+                          isPublished &&
+                            "border-r-sky-200 hover:bg-sky-200"
                         )}
+                        {...provided.dragHandleProps}
                       >
-                        {module.isPublished ? "Published" : "Draft"}
-                      </Badge>
-                      <Pencil
-                        onClick={() => onEdit(module.id)}
-                        className="w-4 h-4 cursor-pointer hover:opacity-75 transition"
-                      />
+                        <Grip className="h-5 w-5" />
+                      </div>
+                      {module.title}
+                      <div className="ml-auto pr-2 flex items-center gap-x-2">
+                        <Badge
+                          className={cn(
+                            "bg-gray-500",
+                            isPublished && "bg-emerald-600"
+                          )}
+                        >
+                          {isPublished ? "Published" : "Draft"}
+                        </Badge>
+                        <Pencil
+                          onClick={() => onEdit(module.id)}
+                          className="w-4 h-4 cursor-pointer hover:opacity-75 transition"
+                        />
+                      </div>
                     </div>
-                  </div>
-                )}
-              </Draggable>
-            ))}
+                  )}
+                </Draggable>
+              );
+            })}
             {provided.placeholder}
           </div>
         )}
